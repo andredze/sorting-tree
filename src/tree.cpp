@@ -2,6 +2,44 @@
 
 //------------------------------------------------------------------------------------------
 
+TreeErr_t TreeGetValue(const TreeNode_t* node, int* array, size_t size)
+{
+    assert(node != NULL);
+
+    static size_t i = 0;
+
+    TreeErr_t error = TREE_SUCCESS;
+
+    if (node->left != NULL)
+    {
+        if ((error = TreeGetValue(node->left, array, size)))
+        {
+            return error;
+        }
+    }
+
+    DPRINTF("i = %d, data = " SPEC "\n", i, node->data);
+    array[i] = node->data;
+    i++;
+
+    if (node->right != NULL)
+    {
+        if ((error = TreeGetValue(node->right, array, size)))
+        {
+            return error;
+        }
+    }
+
+    if (i >= size)
+    {
+        i = 0;
+    }
+
+    return TREE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
 TreeErr_t TreeCtor(Tree_t* tree)
 {
     assert(tree != NULL);

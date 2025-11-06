@@ -1,5 +1,7 @@
 #include "treeGraph.h"
 
+#ifdef TREE_DEBUG
+
 //------------------------------------------------------------------------------------------
 
 int SetDirectories(char* log_filename, char* log_dir)
@@ -402,3 +404,5 @@ int PrintArg(const char* arg_name,
 }
 
 //------------------------------------------------------------------------------------------
+
+#endif

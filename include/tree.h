@@ -8,6 +8,7 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
+TreeErr_t TreeGetValue(const TreeNode_t* node, int* array, size_t size);
 TreeErr_t TreeCtor           (Tree_t*     tree);
 TreeErr_t TreeNodeCtor       (Tree_t*     tree, TreeElem_t data, TreeNode_t** new_node);
 TreeErr_t TreeDtor           (Tree_t*     tree);

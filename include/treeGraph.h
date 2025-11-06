@@ -24,11 +24,13 @@
 
 #else
 
-#define TREE_CALL_DUMP(tree_ptr, name, message, arg)    ;
+#define TREE_CALL_DUMP(tree_ptr, message, arg)    ;
 
 #endif /* TREE_DEBUG */
 
 //——————————————————————————————————————————————————————————————————————————————————————————
+
+#ifdef TREE_DEBUG
 
 TreeErr_t TreeDump            (const Tree_t*     tree, const TreeDumpInfo_t* dump_info);
 
@@ -84,5 +86,7 @@ const int MAX_NODE_NAME_LEN = 32;
 const int MAX_LABEL_LEN     = 256;
 
 //——————————————————————————————————————————————————————————————————————————————————————————
+
+#endif
 
 #endif /* TREE_GRAPH_H */
