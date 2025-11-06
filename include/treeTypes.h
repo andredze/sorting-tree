@@ -75,7 +75,7 @@ typedef struct TreeDumpInfo
     const char* func;
     const char* file;
     int         line;
-    size_t      command_arg;
+    void*       command_arg;
 } TreeDumpInfo_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————

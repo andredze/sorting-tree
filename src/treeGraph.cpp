@@ -69,9 +69,14 @@ TreeErr_t TreeDump(const Tree_t* tree, const TreeDumpInfo_t* dump_info)
 
     calls_count++;
 
-    fprintf(fp, "<pre>\n<h3><font color=blue>%s%zu</font></h3>",
-                dump_info->reason,
-                dump_info->command_arg);
+    fprintf(fp, "<pre>\n<h3><font color=blue>%s", dump_info->reason);
+
+    if (dump_info->command_arg != NULL)
+    {
+        fprintf(fp, "%p", dump_info->command_arg);
+    }
+
+    fprintf(fp, "</font></h3>");
 
     fprintf(fp, dump_info->error == TREE_SUCCESS ?
                 "<font color=green><b>" :

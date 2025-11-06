@@ -88,7 +88,7 @@ TreeErr_t TreeInsert(Tree_t* tree, TreeElem_t data)
         }
     }
 
-    TREE_CALL_DUMP(tree, "DUMP AFTER INSERT DATA TO PTR = %zu", (size_t) new_node);
+    TREE_CALL_DUMP(tree, "DUMP AFTER INSERT DATA TO PTR = ", new_node);
 
     return TREE_SUCCESS;
 }
