@@ -2,36 +2,59 @@
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeGetValue(const TreeNode_t* node, int* array, size_t size)
+TreeErr_t TreeSetValuesToArray(Tree_t* tree, int* array)
 {
-    assert(node != NULL);
+    assert(tree  != NULL);
+    assert(array != NULL);
 
-    static size_t i = 0;
+    size_t i = 0;
+
+    TreeErr_t error = TREE_SUCCESS;
+
+    if (tree->dummy->right == NULL)
+    {
+        return TREE_SUCCESS;
+    }
+
+    if ((error = TreeSetValue(tree->dummy->right, array, &i)))
+    {
+        return error;
+    }
+
+    return TREE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+TreeErr_t TreeSetValue(const TreeNode_t* node, int* array, size_t* i)
+{
+    assert(array != NULL);
+    assert(i     != NULL);
+
+    if (node == NULL)
+    {
+        return TREE_NULL_NODE;
+    }
 
     TreeErr_t error = TREE_SUCCESS;
 
     if (node->left != NULL)
     {
-        if ((error = TreeGetValue(node->left, array, size)))
+        if ((error = TreeSetValue(node->left, array, i)))
         {
             return error;
         }
     }
 
-    array[i] = node->data;
-    i++;
+    DPRINTF("array[%zu] = " SPEC ";\n", *i, node->data);
+    array[(*i)++] = node->data;
 
     if (node->right != NULL)
     {
-        if ((error = TreeGetValue(node->right, array, size)))
+        if ((error = TreeSetValue(node->right, array, i)))
         {
             return error;
         }
-    }
-
-    if (i >= size)
-    {
-        i = 0;
     }
 
     return TREE_SUCCESS;
@@ -148,9 +171,53 @@ TreeErr_t TreeDtor(Tree_t* tree)
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeNodeDtor(TreeNode_t* node)
+TreeErr_t TreeLeftSubtreeDtor(TreeNode_t* node)
 {
     assert(node != NULL);
+
+    return TreeSubtreeDtor(&node->left);
+}
+
+//------------------------------------------------------------------------------------------
+
+TreeErr_t TreeRightSubtreeDtor(TreeNode_t* node)
+{
+    assert(node != NULL);
+
+    return TreeSubtreeDtor(&node->right);
+}
+
+//------------------------------------------------------------------------------------------
+
+TreeErr_t TreeSubtreeDtor(TreeNode_t** node_ptr)
+{
+    assert(node_ptr != NULL);
+
+    if (*node_ptr == NULL)
+    {
+        return TREE_SUCCESS;
+    }
+
+    TreeErr_t error = TREE_SUCCESS;
+
+    if ((error = TreeNodeDtor(*node_ptr)))
+    {
+        return error;
+    }
+
+    *node_ptr = NULL;
+
+    return TREE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+TreeErr_t TreeNodeDtor(TreeNode_t* node)
+{
+    if (node == NULL)
+    {
+        return TREE_NULL_NODE;
+    }
 
     TreeErr_t error = TREE_SUCCESS;
 

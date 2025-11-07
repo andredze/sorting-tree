@@ -85,7 +85,7 @@ int SortTestData(int* data, int** sorted_data_ptr, size_t nums_count)
         return 1;
     }
 
-    TreeGetValue(tree.dummy->right, sorted_data, nums_count);
+    TreeSetValuesToArray(&tree, sorted_data);
 
     TreeDtor(&tree);
 
