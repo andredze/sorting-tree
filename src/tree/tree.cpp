@@ -24,6 +24,8 @@ TreeErr_t TreeLoopPrint(Tree_t* tree)
         return TREE_STACK_ERROR;
     }
 
+    printf("Data sorted with stack: ");
+
     while (node_ctx.node != tree->dummy)
     {
         if (i > tree->size * tree->size)
@@ -56,12 +58,12 @@ TreeErr_t TreeLoopPrint(Tree_t* tree)
 
     StackDtor(&stack);
 
+    printf("\n");
+
     return TREE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------
-
-// хранить в стеке указатели а не структуры?
 
 TreeErr_t TreeLoopTraversalProcessZero(TreeCallsCtx_t* node_ctx, Stack_t* stack)
 {
@@ -146,6 +148,8 @@ TreeErr_t TreeLoopTraversalProcessRight(TreeCallsCtx_t* node_ctx, Stack_t* stack
 
 //------------------------------------------------------------------------------------------
 
+#ifdef TREE_DEBUG
+
 TreeErr_t TreeCheck(Tree_t*     tree,
                     const char* func,
                     const char* file,
@@ -172,9 +176,11 @@ TreeErr_t TreeCheck(Tree_t*     tree,
     return verify_status;
 }
 
+#endif /* TREE_DEBUG */
+
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeSetValuesToArray(Tree_t* tree, int* array)
+TreeErr_t TreeSetValuesToArray(Tree_t* tree, TreeElem_t* array)
 {
     assert(tree  != NULL);
     assert(array != NULL);
@@ -198,7 +204,7 @@ TreeErr_t TreeSetValuesToArray(Tree_t* tree, int* array)
 
 //------------------------------------------------------------------------------------------
 
-TreeErr_t TreeSetValue(const TreeNode_t* node, int* array, size_t* i)
+TreeErr_t TreeSetValue(const TreeNode_t* node, TreeElem_t* array, size_t* i)
 {
     assert(array != NULL);
     assert(i     != NULL);
