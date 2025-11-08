@@ -89,23 +89,28 @@ int RunTreeSortingTest(size_t nums_count)
         data[i] = rand() % 1000;
     }
 
-    int* sorted_data = NULL;
+    int* sorted_data      = NULL;
+    int* loop_sorted_data = NULL;
 
-    if (SortTestData(data, &sorted_data, nums_count))
+    if (SortTestData(data, &sorted_data, &loop_sorted_data, nums_count))
     {
         return 1;
     }
 
-    int result = IsSorted(sorted_data, nums_count);
+    printf("Recursion: ");
+    int result1 = IsSorted(sorted_data,      nums_count);
+    printf("Loop:      ");
+    int result2 = IsSorted(loop_sorted_data, nums_count);
 
-    free(sorted_data);
+    free(sorted_data     );
+    free(loop_sorted_data);
 
-    return result;
+    return result1 + result2;
 }
 
 //------------------------------------------------------------------------------------------
 
-int SortTestData(int* data, int** sorted_data_ptr, size_t nums_count)
+int SortTestData(int* data, int** sorted_data_ptr, int** loop_sorted_data_ptr, size_t nums_count)
 {
     Tree_t tree = {};
 
@@ -136,9 +141,25 @@ int SortTestData(int* data, int** sorted_data_ptr, size_t nums_count)
 
     TreeSetValuesToArray(&tree, sorted_data);
 
+    int* loop_sorted_data = (int*) calloc(nums_count, sizeof(int));
+
+    if (loop_sorted_data == NULL)
+    {
+        PRINTERR("Memory allocation failed");
+        return 1;
+    }
+
+    TreeLoopSetValues   (&tree, loop_sorted_data);
+    // for (size_t i = 0; i < nums_count; i++)
+    // {
+    //     printf("%d ", sorted_data[i]);
+    // }
+    // printf("\n");
+
     TreeDtor(&tree);
 
-    *sorted_data_ptr = sorted_data;
+    *sorted_data_ptr      = sorted_data;
+    *loop_sorted_data_ptr = loop_sorted_data;
 
     return 0;
 }

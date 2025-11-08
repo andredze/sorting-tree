@@ -44,6 +44,14 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
+TreeErr_t TreeLoopSetValues(Tree_t* tree, TreeElem_t* array);
+
+TreeErr_t TreeLoopSetValuesProcessZero(TreeCallsCtx_t* node_ctx, Stack_t* stack,
+                                       TreeElem_t* array, size_t* i);
+
+TreeErr_t TreeLoopSetValuesProcessLeft(TreeCallsCtx_t* node_ctx, Stack_t* stack,
+                                       TreeElem_t* array, size_t* i);
+
 TreeErr_t TreeLoopPrint        (Tree_t*     tree);
 TreeErr_t TreeVerify           (Tree_t*     tree);
 TreeErr_t TreeSetValuesToArray (Tree_t*     tree, TreeElem_t* array);

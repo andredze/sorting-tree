@@ -2,6 +2,133 @@
 
 //------------------------------------------------------------------------------------------
 
+TreeErr_t TreeLoopSetValues(Tree_t* tree, TreeElem_t* array)
+{
+    if (tree->dummy->right == NULL)
+    {
+        return TREE_SUCCESS;
+    }
+
+    Stack_t stack = {};
+
+    if (StackCtor(&stack, STACK_MIN_CAPACITY))
+    {
+        return TREE_STACK_ERROR;
+    }
+
+    size_t i = 0;
+    TreeCallsCtx_t node_ctx = {tree->dummy->right, '\0'};
+
+    if (StackPush(&stack, {tree->dummy, 'R'}))
+    {
+        return TREE_STACK_ERROR;
+    }
+
+    while (node_ctx.node != tree->dummy)
+    {
+        if (i > tree->size * tree->size)
+        {
+            PRINTERR("Iterations exceeded max (i = %zu, size = %zu)", i, tree->size);
+            StackDtor(&stack);
+            return TREE_LOOP;
+        }
+
+        DPRINTF("node = %p, data = " TREE_SPEC ", letter = %c;\n",
+                node_ctx.node,
+                node_ctx.node->data,
+                node_ctx.letter);
+
+        if (node_ctx.letter == '\0')
+        {
+            TreeLoopSetValuesProcessZero (&node_ctx, &stack, array, &i);
+        }
+        else if (node_ctx.letter == 'L')
+        {
+            TreeLoopSetValuesProcessLeft (&node_ctx, &stack, array, &i);
+        }
+        else
+        {
+            TreeLoopTraversalProcessRight(&node_ctx, &stack);
+        }
+    }
+
+    StackDtor(&stack);
+
+    return TREE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+TreeErr_t TreeLoopSetValuesProcessZero(TreeCallsCtx_t* node_ctx, Stack_t* stack,
+                                       TreeElem_t* array, size_t* i)
+{
+    assert(node_ctx != NULL);
+    assert(stack    != NULL);
+
+    if (node_ctx->node->left != NULL)
+    {
+        if (StackPush(stack, {node_ctx->node, 'L'}))
+        {
+            return TREE_STACK_ERROR;
+        }
+        node_ctx->node = node_ctx->node->left;
+
+        return TREE_SUCCESS;
+    }
+
+    array[(*i)++] = node_ctx->node->data;
+
+    if (node_ctx->node->right != NULL)
+    {
+        if (StackPush(stack, {node_ctx->node, 'R'}))
+        {
+            return TREE_STACK_ERROR;
+        }
+        node_ctx->node = node_ctx->node->right;
+    }
+    else
+    {
+        if (StackPop(stack, node_ctx))
+        {
+            return TREE_STACK_ERROR;
+        }
+    }
+
+    return TREE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+TreeErr_t TreeLoopSetValuesProcessLeft(TreeCallsCtx_t* node_ctx, Stack_t* stack,
+                                       TreeElem_t* array, size_t* i)
+{
+    assert(node_ctx != NULL);
+    assert(stack    != NULL);
+
+    array[(*i)++] = node_ctx->node->data;
+
+    if (node_ctx->node->right != NULL)
+    {
+        if (StackPush(stack, {node_ctx->node, 'R'}))
+        {
+            return TREE_STACK_ERROR;
+        }
+        node_ctx->node   = node_ctx->node->right;
+        node_ctx->letter = '\0';
+    }
+    else
+    {
+        if (StackPop(stack, node_ctx))
+        {
+            return TREE_STACK_ERROR;
+        }
+    }
+
+    return TREE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
 TreeErr_t TreeLoopPrint(Tree_t* tree)
 {
     if (tree->dummy->right == NULL)
