@@ -67,6 +67,10 @@ TreeErr_t TreeCheck(Tree_t*     tree,
                     int         line,
                     void*       arg);
 
+TreeErr_t TreeLoopTraversalProcessZero (TreeCallsCtx_t* node_ctx, Stack_t* stack);
+TreeErr_t TreeLoopTraversalProcessLeft (TreeCallsCtx_t* node_ctx, Stack_t* stack);
+TreeErr_t TreeLoopTraversalProcessRight(TreeCallsCtx_t* node_ctx, Stack_t* stack);
+
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 #endif /* TREE_H */

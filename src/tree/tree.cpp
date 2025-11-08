@@ -17,72 +17,129 @@ TreeErr_t TreeLoopPrint(Tree_t* tree)
     }
 
     size_t i = 0;
-    TreeCallsCtx_t node_ctx = {tree->dummy, '\0'};
+    TreeCallsCtx_t node_ctx = {tree->dummy->right, '\0'};
 
-    while (node_ctx.node != tree->dummy || i == 0)
+    if (StackPush(&stack, {tree->dummy, 'R'}))
     {
-        if (i > 100)
+        return TREE_STACK_ERROR;
+    }
+
+    while (node_ctx.node != tree->dummy)
+    {
+        if (i > tree->size * tree->size)
         {
             PRINTERR("Iterations exceeded max (i = %zu, size = %zu)", i, tree->size);
             StackDtor(&stack);
             return TREE_LOOP;
         }
 
-        DPRINTF("node = %p, data = " TREE_SPEC ", letter = %c;\n", node_ctx.node, node_ctx.node->data, node_ctx.letter);
+        DPRINTF("node = %p, data = " TREE_SPEC ", letter = %c;\n",
+                node_ctx.node,
+                node_ctx.node->data,
+                node_ctx.letter);
 
         if (node_ctx.letter == '\0')
         {
-            if (node_ctx.node->left != NULL)
-            {
-                StackPush(&stack, {node_ctx.node,  'L'});
-                node_ctx.node = node_ctx.node->left;
-                continue;
-            }
-
-            if (node_ctx.node != tree->dummy)
-            {
-                printf(" " TREE_SPEC " ", node_ctx.node->data);
-            }
-
-            if (node_ctx.node->right != NULL)
-            {
-                StackPush(&stack, {node_ctx.node, 'R'});
-                node_ctx.node = node_ctx.node->right;
-            }
-            else
-            {
-                DPRINTF("bef stackpop: node = %p, data = " TREE_SPEC ", letter = %c;\n", node_ctx.node, node_ctx.node->data, node_ctx.letter);
-                StackPop(&stack, &node_ctx);
-                DPRINTF("aft stackpop: node = %p, data = " TREE_SPEC ", letter = %c;\n", node_ctx.node, node_ctx.node->data, node_ctx.letter);
-            }
+            TreeLoopTraversalProcessZero(&node_ctx, &stack);
         }
         else if (node_ctx.letter == 'L')
         {
-            printf(" " TREE_SPEC " ", node_ctx.node->data);
-
-            if (node_ctx.node->right != NULL)
-            {
-                StackPush(&stack, {node_ctx.node, 'R'});
-                node_ctx.node = node_ctx.node->right;
-                node_ctx.letter = '\0';
-            }
-            else
-            {
-                DPRINTF("bef stackpop: node = %p, data = " TREE_SPEC ", letter = %c;\n", node_ctx.node, node_ctx.node->data, node_ctx.letter);
-                StackPop(&stack, &node_ctx);
-                DPRINTF("aft stackpop: node = %p, data = " TREE_SPEC ", letter = %c;\n", node_ctx.node, node_ctx.node->data, node_ctx.letter);
-            }
+            TreeLoopTraversalProcessLeft(&node_ctx, &stack);
         }
         else
         {
-            DPRINTF("bef stackpop: node = %p, data = " TREE_SPEC ", letter = %c;\n", node_ctx.node, node_ctx.node->data, node_ctx.letter);
-            StackPop(&stack, &node_ctx);
-            DPRINTF("aft stackpop: node = %p, data = " TREE_SPEC ", letter = %c;\n", node_ctx.node, node_ctx.node->data, node_ctx.letter);
+            TreeLoopTraversalProcessRight(&node_ctx, &stack);
         }
+
         i++;
     }
 
     StackDtor(&stack);
+
+    return TREE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+// хранить в стеке указатели а не структуры?
+
+TreeErr_t TreeLoopTraversalProcessZero(TreeCallsCtx_t* node_ctx, Stack_t* stack)
+{
+    assert(node_ctx != NULL);
+    assert(stack    != NULL);
+
+    if (node_ctx->node->left != NULL)
+    {
+        if (StackPush(stack, {node_ctx->node, 'L'}))
+        {
+            return TREE_STACK_ERROR;
+        }
+        node_ctx->node = node_ctx->node->left;
+
+        return TREE_SUCCESS;
+    }
+
+    printf(" " TREE_SPEC " ", node_ctx->node->data);
+
+    if (node_ctx->node->right != NULL)
+    {
+        if (StackPush(stack, {node_ctx->node, 'R'}))
+        {
+            return TREE_STACK_ERROR;
+        }
+        node_ctx->node = node_ctx->node->right;
+    }
+    else
+    {
+        if (StackPop(stack, node_ctx))
+        {
+            return TREE_STACK_ERROR;
+        }
+    }
+
+    return TREE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+TreeErr_t TreeLoopTraversalProcessLeft(TreeCallsCtx_t* node_ctx, Stack_t* stack)
+{
+    assert(node_ctx != NULL);
+    assert(stack    != NULL);
+
+    printf(" " TREE_SPEC " ", node_ctx->node->data);
+
+    if (node_ctx->node->right != NULL)
+    {
+        if (StackPush(stack, {node_ctx->node, 'R'}))
+        {
+            return TREE_STACK_ERROR;
+        }
+        node_ctx->node   = node_ctx->node->right;
+        node_ctx->letter = '\0';
+    }
+    else
+    {
+        if (StackPop(stack, node_ctx))
+        {
+            return TREE_STACK_ERROR;
+        }
+    }
+
+    return TREE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+TreeErr_t TreeLoopTraversalProcessRight(TreeCallsCtx_t* node_ctx, Stack_t* stack)
+{
+    assert(node_ctx != NULL);
+    assert(stack    != NULL);
+
+    if (StackPop(stack, node_ctx))
+    {
+        return TREE_STACK_ERROR;
+    }
 
     return TREE_SUCCESS;
 }
